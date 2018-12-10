@@ -4,6 +4,7 @@ import ErrorButton from '../error-button/error-button';
 import ErrorBoundery from '../error-boundry/error-boundry';
 
 import './item-details.css';
+import Spinner from '../spinner';
 
 const Record = ({ item, field, label }) => {
   return (
@@ -22,7 +23,8 @@ export default class ItemDetails extends Component {
 
   state = {
     item: null,
-    image: null
+    image: null,
+    loaded: false
   };
 
   componentDidMount() {
@@ -33,6 +35,9 @@ export default class ItemDetails extends Component {
     if (this.props.itemId !== prevProps.itemId ||
       this.props.getData !== prevProps.getData ||
       this.props.getImageUrl !== prevProps.getImageUrl) {
+      this.setState({
+        loaded: false
+      });
       this.updateItem();
     }
   }
@@ -47,16 +52,26 @@ export default class ItemDetails extends Component {
       .then((item) => {
         this.setState({
           item,
-          image: getImageUrl(item)
+          image: getImageUrl(item),
+          loaded: true
         });
       });
   }
 
   render() {
 
-    const { item, image } = this.state;
+    const { item, image, loaded } = this.state;
+
     if (!item) {
       return <span>Select a item from a list</span>;
+    }
+
+    if (!loaded) {
+      return (
+        <div className="item-details card">
+          <Spinner/>
+        </div>
+      );
     }
 
     const { name } = item;
